@@ -47,6 +47,12 @@ async function run() {
       const result = await WishListCollection.insertOne(wishListBioData);
       res.send(result)
     })
+    app.get('/wishlist', async (req, res) => {
+      const email = req.query.email;
+      const query= {email:email}
+      const result = await WishListCollection.find(query).toArray();
+      res.send(result)
+    });
 
 
 
