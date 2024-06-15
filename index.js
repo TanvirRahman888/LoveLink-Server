@@ -30,10 +30,34 @@ async function run() {
     const SuccessStoryCollection = client.db("LoveLink").collection("SuccessStory");
     const WishListCollection = client.db("LoveLink").collection("WishList");
 
+    // app.get('/biodata', async (req, res) => {
+    //   const result = await BiodataCollection.find().toArray();
+    //   res.send(result)
+    // })
     app.get('/biodata', async (req, res) => {
-      const result = await BiodataCollection.find().toArray();
-      res.send(result)
-    })
+      const { Gender, PermanentDivisionName, minAge, maxAge, MaritalStatus, Occupation, Religion, premiumMember } = req.query;
+  
+      // Construct query object
+      let query = {};
+      if (Gender) query.Gender = Gender;
+      if (PermanentDivisionName) query.PermanentDivisionName = PermanentDivisionName;
+      if (minAge && maxAge) {
+          query.Age = { $gte: parseInt(minAge), $lte: parseInt(maxAge) };
+      }
+      if (MaritalStatus) query.MaritalStatus = MaritalStatus;
+      if (Occupation) query.Occupation = Occupation;
+      if (Religion) query.Religion = Religion;
+      if (premiumMember) query.PremiumMember = premiumMember
+  
+      try {
+          const result = await BiodataCollection.find(query).toArray();
+          res.json(result);
+      } catch (error) {
+          console.error('Error fetching biodata:', error);
+          res.status(500).json({ error: 'Internal Server Error' });
+      }
+  });
+
     app.get('/biodata/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) }; // Convert id to ObjectId
@@ -49,12 +73,25 @@ async function run() {
     })
     app.get('/wishlist', async (req, res) => {
       const email = req.query.email;
-      const query= {email:email}
+      const query = { email: email }
       const result = await WishListCollection.find(query).toArray();
       res.send(result)
     });
 
+    // app.get('/wishlist', async (req, res) => {
+    //   const { email, Occupation } = req.query;
+    //   const query = {};
 
+    //   if (email) {
+    //     query.email = email;
+    //   }
+    //   if (Occupation) {
+    //     query.Occupation = Occupation;
+    //   }
+
+    //   const result = await WishListCollection.find(query).toArray();
+    //   res.send(result);
+    // });
 
 
     app.get('/successstory', async (req, res) => {
