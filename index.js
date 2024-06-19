@@ -49,7 +49,6 @@ async function run() {
       if (Religion) query.Religion = Religion;
       if (premiumMember) query.PremiumMember = premiumMember;
     
-      // Construct sort object
       let sortAge = {};
       if (sort) {
         if (sort === 'HighToLow') {
@@ -67,6 +66,19 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) }; // Convert id to ObjectId
       const result = await BiodataCollection.findOne(query);
+      res.send(result);
+    });
+
+    app.get('/biodata/similar/:id', async (req, res) => {
+      const id = req.params.id;
+      const currentBiodata = await BiodataCollection.findOne({ _id: new ObjectId(id) });
+    
+      if (!currentBiodata) {
+        return res.send("Finding the most similar Biodata");
+      }
+    
+      const query = { Gender: currentBiodata.Gender, _id: { $ne: new ObjectId(id) } };
+      const result = await BiodataCollection.find(query).limit(3).toArray();
       res.send(result);
     });
 
