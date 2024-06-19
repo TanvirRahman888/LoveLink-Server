@@ -35,28 +35,33 @@ async function run() {
     //   res.send(result)
     // })
     app.get('/biodata', async (req, res) => {
-      const { Gender, PermanentDivisionName, minAge, maxAge, MaritalStatus, Occupation, Religion, premiumMember } = req.query;
-  
+      const { Gender, PermanentDivisionName, minAge, maxAge, MaritalStatus, Occupation, Religion, premiumMember, sort } = req.query;
+    
       // Construct query object
       let query = {};
       if (Gender) query.Gender = Gender;
       if (PermanentDivisionName) query.PermanentDivisionName = PermanentDivisionName;
       if (minAge && maxAge) {
-          query.Age = { $gte: parseInt(minAge), $lte: parseInt(maxAge) };
+        query.Age = { $gte: parseInt(minAge), $lte: parseInt(maxAge) };
       }
       if (MaritalStatus) query.MaritalStatus = MaritalStatus;
       if (Occupation) query.Occupation = Occupation;
       if (Religion) query.Religion = Religion;
-      if (premiumMember) query.PremiumMember = premiumMember
-  
-      try {
-          const result = await BiodataCollection.find(query).toArray();
-          res.json(result);
-      } catch (error) {
-          console.error('Error fetching biodata:', error);
-          res.status(500).json({ error: 'Internal Server Error' });
+      if (premiumMember) query.PremiumMember = premiumMember;
+    
+      // Construct sort object
+      let sortAge = {};
+      if (sort) {
+        if (sort === 'HighToLow') {
+          sortAge.Age = -1;
+        } else if (sort === 'LowToHigh') {
+          sortAge.Age = 1;
+        }
       }
-  });
+    
+      const result = await BiodataCollection.find(query).sort(sortAge).toArray();
+      res.json(result);
+    });
 
     app.get('/biodata/:id', async (req, res) => {
       const id = req.params.id;
