@@ -26,17 +26,22 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
+    const usersCollection = client.db("LoveLink").collection("users");
     const BiodataCollection = client.db("LoveLink").collection("Biodata");
     const SuccessStoryCollection = client.db("LoveLink").collection("SuccessStory");
     const WishListCollection = client.db("LoveLink").collection("WishList");
 
-    // app.get('/biodata', async (req, res) => {
-    //   const result = await BiodataCollection.find().toArray();
-    //   res.send(result)
-    // })
+
+    app.post('/users', async (req, res)=>{
+      const user = req.body;
+      const result = await usersCollection.insertOne(user)
+      res.send(result)
+    })
+
+    
     app.get('/biodata', async (req, res) => {
       const { Gender, PermanentDivisionName, minAge, maxAge, MaritalStatus, Occupation, Religion, premiumMember, sort } = req.query;
-    
+
       // Construct query object
       let query = {};
       if (Gender) query.Gender = Gender;
@@ -48,7 +53,7 @@ async function run() {
       if (Occupation) query.Occupation = Occupation;
       if (Religion) query.Religion = Religion;
       if (premiumMember) query.PremiumMember = premiumMember;
-    
+
       let sortAge = {};
       if (sort) {
         if (sort === 'HighToLow') {
@@ -57,7 +62,7 @@ async function run() {
           sortAge.Age = 1;
         }
       }
-    
+
       const result = await BiodataCollection.find(query).sort(sortAge).toArray();
       res.json(result);
     });
@@ -72,15 +77,18 @@ async function run() {
     app.get('/biodata/similar/:id', async (req, res) => {
       const id = req.params.id;
       const currentBiodata = await BiodataCollection.findOne({ _id: new ObjectId(id) });
-    
+
       if (!currentBiodata) {
         return res.send("Finding the most similar Biodata");
       }
-    
+
       const query = { Gender: currentBiodata.Gender, _id: { $ne: new ObjectId(id) } };
       const result = await BiodataCollection.find(query).limit(3).toArray();
       res.send(result);
     });
+
+  
+  
 
     // WishList Post
     app.post('/wishlist', async (req, res) => {
