@@ -3,7 +3,6 @@ const app = express()
 const cors = require('cors')
 require('dotenv').config()
 const port = process.env.PORT || 5000;
-// const { ObjectId } = require('mongodb');
 
 
 // middleware
@@ -34,24 +33,24 @@ async function run() {
     const WishListCollection = client.db("LoveLink").collection("WishList");
 
 
-    
-    app.post('/users', async (req, res)=>{
+
+    app.post('/users', async (req, res) => {
       const user = req.body;
-      const query = {ContactEmail : user.ContactEmail}
-      const existingUser= await usersCollection.findOne(query)
+      const query = { ContactEmail: user.ContactEmail }
+      const existingUser = await usersCollection.findOne(query)
       if (existingUser) {
-        return res.send({message: "User Already Exists", insertedId: null})
+        return res.send({ message: "User Already Exists", insertedId: null })
       }
       const result = await usersCollection.insertOne(user)
       res.send(result)
     })
 
-    app.post('/biodata', async (req, res)=>{
+    app.post('/biodata', async (req, res) => {
       const user = req.body;
-      const query = {ContactEmail : user.ContactEmail}
-      const existingUser= await BiodataCollection.findOne(query)
+      const query = { ContactEmail: user.ContactEmail }
+      const existingUser = await BiodataCollection.findOne(query)
       if (existingUser) {
-        return res.send({message: "User Already Exists", insertedId: null})
+        return res.send({ message: "User Already Exists", insertedId: null })
       }
       const result = await BiodataCollection.insertOne(user)
       res.send(result)
@@ -60,25 +59,27 @@ async function run() {
     app.patch('/biodata/:email', async (req, res) => {
       const email = req.params.email;
       const updatedBiodata = req.body;
+      delete updatedBiodata._id;
       console.log(updatedBiodata);
-  
+
       const filter = { ContactEmail: email };
       const updateDoc = {
-          $set: updatedBiodata,
+        $set: updatedBiodata,
       };
-  
-      try {
-          const result = await BiodataCollection.updateOne(filter, updateDoc);
-          res.send(result);
-      } catch (error) {
-          console.error("An error occurred:", error);
-          res.status(500).send({ message: "An error occurred", error });
-      }
-  });
-    
-    
+      const result = await BiodataCollection.updateOne(filter, updateDoc);
+      res.send(result);
 
-    
+    });
+    app.get('/myprofile/:email', async (req, res) => {
+      const email = req.params.email;
+      const query = { ContactEmail: email };
+      const userBiodata = await BiodataCollection.findOne(query);
+      res.send(userBiodata);
+    });
+
+
+
+
     app.get('/biodata', async (req, res) => {
       const { Gender, PermanentDivisionName, minAge, maxAge, MaritalStatus, Occupation, Religion, premiumMember, sort } = req.query;
 
@@ -127,8 +128,8 @@ async function run() {
       res.send(result);
     });
 
-  
-  
+
+
 
     // WishList Post
     app.post('/wishlist', async (req, res) => {
