@@ -32,9 +32,20 @@ async function run() {
     const WishListCollection = client.db("LoveLink").collection("WishList");
 
 
+    // app.post('/users', async (req, res)=>{
+    //   const user = req.body;
+    //   console.log(user);
+    //   const query = {ContactEmail : user.email}
+    //   const existingUser= await usersCollection.findOne(query)
+    //   if (existingUser) {
+    //     return res.send({message: "User Already Exists", insertedId: null})
+    //   }
+    //   const result = await usersCollection.insertOne(user)
+    //   res.send(result)
+    // })
     app.post('/users', async (req, res)=>{
       const user = req.body;
-      const query = {email : user.email}
+      const query = {ContactEmail : user.ContactEmail}
       const existingUser= await usersCollection.findOne(query)
       if (existingUser) {
         return res.send({message: "User Already Exists", insertedId: null})
@@ -42,6 +53,19 @@ async function run() {
       const result = await usersCollection.insertOne(user)
       res.send(result)
     })
+
+    app.post('/biodata', async (req, res)=>{
+      const user = req.body;
+      const query = {ContactEmail : user.ContactEmail}
+      const existingUser= await BiodataCollection.findOne(query)
+      if (existingUser) {
+        return res.send({message: "User Already Exists", insertedId: null})
+      }
+      const result = await BiodataCollection.insertOne(user)
+      res.send(result)
+    })
+    
+    
 
     
     app.get('/biodata', async (req, res) => {
