@@ -3,6 +3,8 @@ const app = express()
 const cors = require('cors')
 require('dotenv').config()
 const port = process.env.PORT || 5000;
+// const { ObjectId } = require('mongodb');
+
 
 // middleware
 
@@ -32,17 +34,7 @@ async function run() {
     const WishListCollection = client.db("LoveLink").collection("WishList");
 
 
-    // app.post('/users', async (req, res)=>{
-    //   const user = req.body;
-    //   console.log(user);
-    //   const query = {ContactEmail : user.email}
-    //   const existingUser= await usersCollection.findOne(query)
-    //   if (existingUser) {
-    //     return res.send({message: "User Already Exists", insertedId: null})
-    //   }
-    //   const result = await usersCollection.insertOne(user)
-    //   res.send(result)
-    // })
+    
     app.post('/users', async (req, res)=>{
       const user = req.body;
       const query = {ContactEmail : user.ContactEmail}
@@ -64,6 +56,25 @@ async function run() {
       const result = await BiodataCollection.insertOne(user)
       res.send(result)
     })
+
+    app.patch('/biodata/:email', async (req, res) => {
+      const email = req.params.email;
+      const updatedBiodata = req.body;
+      console.log(updatedBiodata);
+  
+      const filter = { ContactEmail: email };
+      const updateDoc = {
+          $set: updatedBiodata,
+      };
+  
+      try {
+          const result = await BiodataCollection.updateOne(filter, updateDoc);
+          res.send(result);
+      } catch (error) {
+          console.error("An error occurred:", error);
+          res.status(500).send({ message: "An error occurred", error });
+      }
+  });
     
     
 
