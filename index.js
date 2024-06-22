@@ -37,6 +37,13 @@ async function run() {
       const result = await usersCollection.find().toArray();
       res.send(result)
     })
+    app.delete('/users/:email', async (req, res) => {
+      const email = req.params.email;
+      const result = await usersCollection.deleteOne({ ContactEmail: email });
+      if (result.deletedCount === 1) {
+        res.send({ success: true, message: "User deleted successfully" });
+      }
+    });
     app.post('/users', async (req, res) => {
       const user = req.body;
       const query = { ContactEmail: user.ContactEmail }
@@ -53,11 +60,28 @@ async function run() {
       const result = await BiodataCollection.find().toArray();
       res.send(result)
     })
+    app.delete('/allbiodata/:email', async (req, res) => {
+      const email = req.params.email;
+      const result = await BiodataCollection.deleteOne({ ContactEmail: email });
+      if (result.deletedCount === 1) {
+        res.send({ success: true, message: "User deleted successfully" });
+      }
+    });
+
     app.get('/malebiodata', async (req, res) => {
       const query = { Gender: "Male" }
       const result = await BiodataCollection.find(query).toArray();
       res.send(result)
     })
+    // app.delete('/malebiodata/:email', async (req, res) => {
+    //   const email = req.params.email;
+    //   const result = await BiodataCollection.deleteOne({ ContactEmail: email });
+    //   if (result.deletedCount === 1) {
+    //     res.send({ success: true, message: "User deleted successfully" });
+    //   }
+    // });
+
+
     app.get('/femalebiodata', async (req, res) => {
       const query = { Gender: "Female" }
       const result = await BiodataCollection.find(query).toArray();
