@@ -73,17 +73,14 @@ async function run() {
       const result = await BiodataCollection.find(query).toArray();
       res.send(result)
     })
-    // app.delete('/malebiodata/:email', async (req, res) => {
-    //   const email = req.params.email;
-    //   const result = await BiodataCollection.deleteOne({ ContactEmail: email });
-    //   if (result.deletedCount === 1) {
-    //     res.send({ success: true, message: "User deleted successfully" });
-    //   }
-    // });
-
-
     app.get('/femalebiodata', async (req, res) => {
       const query = { Gender: "Female" }
+      const result = await BiodataCollection.find(query).toArray();
+      res.send(result)
+    })
+
+    app.get('/premiummember', async (req, res) => {
+      const query = { PremiumMember: "true" }
       const result = await BiodataCollection.find(query).toArray();
       res.send(result)
     })
