@@ -33,7 +33,10 @@ async function run() {
     const WishListCollection = client.db("LoveLink").collection("WishList");
 
 
-
+    app.get('/users', async (req, res) => {
+      const result = await usersCollection.find().toArray();
+      res.send(result)
+    })
     app.post('/users', async (req, res) => {
       const user = req.body;
       const query = { ContactEmail: user.ContactEmail }
@@ -42,6 +45,22 @@ async function run() {
         return res.send({ message: "User Already Exists", insertedId: null })
       }
       const result = await usersCollection.insertOne(user)
+      res.send(result)
+    })
+
+    // ------------------------------
+    app.get('/allbiodata', async (req, res) => {
+      const result = await BiodataCollection.find().toArray();
+      res.send(result)
+    })
+    app.get('/malebiodata', async (req, res) => {
+      const query = { Gender: "Male" }
+      const result = await BiodataCollection.find(query).toArray();
+      res.send(result)
+    })
+    app.get('/femalebiodata', async (req, res) => {
+      const query = { Gender: "Female" }
+      const result = await BiodataCollection.find(query).toArray();
       res.send(result)
     })
 
@@ -82,8 +101,6 @@ async function run() {
 
     app.get('/biodata', async (req, res) => {
       const { Gender, PermanentDivisionName, minAge, maxAge, MaritalStatus, Occupation, Religion, premiumMember, sort } = req.query;
-
-      // Construct query object
       let query = {};
       if (Gender) query.Gender = Gender;
       if (PermanentDivisionName) query.PermanentDivisionName = PermanentDivisionName;
@@ -143,21 +160,6 @@ async function run() {
       const result = await WishListCollection.find(query).toArray();
       res.send(result)
     });
-
-    // app.get('/wishlist', async (req, res) => {
-    //   const { email, Occupation } = req.query;
-    //   const query = {};
-
-    //   if (email) {
-    //     query.email = email;
-    //   }
-    //   if (Occupation) {
-    //     query.Occupation = Occupation;
-    //   }
-
-    //   const result = await WishListCollection.find(query).toArray();
-    //   res.send(result);
-    // });
 
 
     app.get('/successstory', async (req, res) => {
